@@ -1,7 +1,7 @@
 #! python3
 import sys
-from tkinter import Tk, Menu, Label, Button, Toplevel, BooleanVar, messagebox
-from tkinter.ttk import Combobox, Checkbutton, Entry, Style
+from tkinter import Tk, Menu, Toplevel, BooleanVar, messagebox
+from tkinter import ttk
 
 from bot_internals.BotLog import log
 from bot_internals.DatabaseManager import database
@@ -15,9 +15,10 @@ class Interface:
         self.window = Tk()
         self.window.title(f"FIB v{current_version}")
         self.window.geometry("380x225")
-        self.style = Style()
-        # if sys.platform == "win32":
-        #     self.style.theme_use('winnative')
+        self.style = ttk.Style()
+        self.style.theme_use("clam")
+        self.style.configure("Blue.TButton", foreground="white", background="blue")
+        self.style.configure("Status.TLabel", foreground="white", background="black")
         self.window.minsize(380, 200)
         self.window.wait_visibility(self.window)
         self.windowWidth = self.window.winfo_reqwidth()
@@ -47,17 +48,16 @@ class Interface:
 
         self.window.config(menu=self.main_menu)
 
-        self.info_label = Label(self.window, text="STOP BOT: SHIFT + ESC", font=("Helvetica", 16))
+        self.info_label = ttk.Label(self.window, text="STOP BOT: SHIFT + ESC", font=("Helvetica", 16))
         self.info_label.grid(column=0, row=0, padx=15, pady=10, columnspan=2)
 
-        self.btn1 = Button(self.window, text="GENERAL OPTIONS", command=self.options_win, width=50)
+        self.btn1 = ttk.Button(self.window, text="GENERAL OPTIONS", command=self.options_win, width=50)
         self.btn1.grid(column=0, row=1, padx=15, pady=5, columnspan=2)
 
-        self.btn2 = Button(self.window, text="CONFIGURE PARTY", command=self.party_win, width=50)
+        self.btn2 = ttk.Button(self.window, text="CONFIGURE PARTY", command=self.party_win, width=50)
         self.btn2.grid(column=0, row=2, padx=15, pady=0, columnspan=2)
 
-        self.gobtn = Button(self.window, text="<---    START    --->", command=self.ready_set_go, width=50)
-        self.gobtn.config(foreground="white", background="blue")
+        self.gobtn = ttk.Button(self.window, text="<---    START    --->", command=self.ready_set_go, width=50, style="Blue.TButton")
         self.gobtn.grid(column=0, row=3, padx=15, pady=20, columnspan=2)
 
         # self.window.bind('<Control-n>', self.party_win)
@@ -90,7 +90,7 @@ class Interface:
 
 
 
-        self.options_text = Label(self.options_win, text="Use the boxes below to set your preferred options.")
+        self.options_text = ttk.Label(self.options_win, text="Use the boxes below to set your preferred options.")
         self.options_text.grid(column=0, row=0, padx=15, pady=5, columnspan=2)
 
         # Toggle if you want the bot to automatically prestige for you
@@ -98,15 +98,15 @@ class Interface:
         self.prestige_state = BooleanVar(self.options_win)
         if database.auto_prestige:
             self.prestige_state.set(True)
-        self.prestige_toggle = Checkbutton(self.options_win, text="Auto-Prestige?", var=self.prestige_state)
+        self.prestige_toggle = ttk.Checkbutton(self.options_win, text="Auto-Prestige?", variable=self.prestige_state)
         self.prestige_toggle.grid(column=0, row=5, padx=15, pady=5, sticky="w")
 
         # Selection for update channel
 
-        self.updates_label = Label(self.options_win, text="Updates Channel:")
+        self.updates_label = ttk.Label(self.options_win, text="Updates Channel:")
         self.updates_label.grid(column=0, row=3, padx=15, pady=2, sticky="w")
 
-        self.channel_choice = Combobox(self.options_win, state="readonly")
+        self.channel_choice = ttk.Combobox(self.options_win, state="readonly")
         self.channel_choice['values'] = ("Stable", "Development")
         if database.channel == "Stable":
             self.channel_choice.current(0)
@@ -117,10 +117,10 @@ class Interface:
             self.channel_choice.current(2)
         self.channel_choice.grid(column=0, row=4, padx=15, pady=5, sticky="w")
 
-        self.guardian_label = Label(self.options_win, text="Which Guardian:")
+        self.guardian_label = ttk.Label(self.options_win, text="Which Guardian:")
         self.guardian_label.grid(column=0, row=1, padx=15, pady=2, sticky="w")
 
-        self.guardian_choice = Combobox(self.options_win, state="readonly")
+        self.guardian_choice = ttk.Combobox(self.options_win, state="readonly")
         self.guardian_choice['values'] = [x for x in database.guardians]
         if database.guardian == "Fairy":
             self.guardian_choice.current(1)
@@ -131,20 +131,19 @@ class Interface:
         self.guild_missions_state = BooleanVar(self.options_win)
         if database.guild_missions:
             self.guild_missions_state.set(True)
-        self.guild_missions_toggle = Checkbutton(self.options_win, text="Guild Missions?",
-                                                 var=self.guild_missions_state)
+        self.guild_missions_toggle = ttk.Checkbutton(self.options_win, text="Guild Missions?",
+                                                 variable=self.guild_missions_state)
         self.guild_missions_toggle.grid(column=1, row=5, padx=15, pady=5, sticky="w")
 
-        self.prestige_level_label = Label(self.options_win, text="Prestige Multiplier:")
+        self.prestige_level_label = ttk.Label(self.options_win, text="Prestige Multiplier:")
         self.prestige_level_label.grid(column=1, row=1, padx=15, pady=2, sticky="w")
 
-        self.prestige_level = Entry(self.options_win)
+        self.prestige_level = ttk.Entry(self.options_win)
         self.prestige_level.grid(column=1, row=2, padx=15, pady=5, sticky="w")
         self.prestige_level.insert(0, database.prestige_level)
 
-        self.g_btn = Button(self.options_win, text="SAVE", width=40, command=self.options_save)
+        self.g_btn = ttk.Button(self.options_win, text="SAVE", width=40, command=self.options_save, style="Blue.TButton")
         self.g_btn.grid(column=0, row=6, padx=15, pady=15, columnspan=2)
-        self.g_btn.config(foreground="white", background="blue")
 
     def options_save(self, e=None):
         database.save_option('prestige_level', self.prestige_level.get())
@@ -175,60 +174,59 @@ class Interface:
         Begin building the GUI
 
         """
-        self.party_text = Label(self.party_win, text="Use the boxes below to set your party options.")
+        self.party_text = ttk.Label(self.party_win, text="Use the boxes below to set your party options.")
         self.party_text.grid(column=0, row=0, padx=15, pady=5, columnspan=2)
 
-        self.party1_label = Label(self.party_win, text="Party Slot 01:")
+        self.party1_label = ttk.Label(self.party_win, text="Party Slot 01:")
         self.party1_label.grid(column=0, row=1, padx=15, pady=5, sticky="w")
 
-        self.party2_label = Label(self.party_win, text="Party Slot 02:")
+        self.party2_label = ttk.Label(self.party_win, text="Party Slot 02:")
         self.party2_label.grid(column=1, row=1, padx=15, pady=5, sticky="w")
 
-        self.party1 = Combobox(self.party_win, state="readonly")
+        self.party1 = ttk.Combobox(self.party_win, state="readonly")
         self.party1['values'] = [x for x in database.heroes]
         self.party1.current(4)
         self.party1.grid(column=0, row=2, padx=15, pady=5, sticky="w")
 
-        self.party2 = Combobox(self.party_win, state="readonly")
+        self.party2 = ttk.Combobox(self.party_win, state="readonly")
         self.party2['values'] = [x for x in database.heroes]
         self.party2.current(10)
         self.party2.grid(column=1, row=2, padx=15, pady=5, sticky="w")
 
-        self.party3_label = Label(self.party_win, text="Party Slot 03:")
+        self.party3_label = ttk.Label(self.party_win, text="Party Slot 03:")
         self.party3_label.grid(column=0, row=3, padx=15, pady=5, sticky="w")
 
-        self.party4_label = Label(self.party_win, text="Party Slot 04:")
+        self.party4_label = ttk.Label(self.party_win, text="Party Slot 04:")
         self.party4_label.grid(column=1, row=3, padx=15, pady=5, sticky="w")
 
-        self.party3 = Combobox(self.party_win, state="readonly")
+        self.party3 = ttk.Combobox(self.party_win, state="readonly")
         self.party3['values'] = [x for x in database.heroes]
         self.party3.current(5)
         self.party3.grid(column=0, row=4, padx=15, pady=5, sticky="w")
 
-        self.party4 = Combobox(self.party_win, state="readonly")
+        self.party4 = ttk.Combobox(self.party_win, state="readonly")
         self.party4['values'] = [x for x in database.heroes]
         self.party4.current(2)
         self.party4.grid(column=1, row=4, padx=15, pady=5, sticky="w")
 
-        self.party5_label = Label(self.party_win, text="Party Slot 05:")
+        self.party5_label = ttk.Label(self.party_win, text="Party Slot 05:")
         self.party5_label.grid(column=0, row=5, padx=15, pady=5, sticky="w")
 
-        self.party_size_label = Label(self.party_win, text="Party Size:")
+        self.party_size_label = ttk.Label(self.party_win, text="Party Size:")
         self.party_size_label.grid(column=1, row=5, padx=15, pady=5, sticky="w")
 
-        self.party5 = Combobox(self.party_win, state="readonly")
+        self.party5 = ttk.Combobox(self.party_win, state="readonly")
         self.party5['values'] = [x for x in database.heroes]
         self.party5.current(3)
         self.party5.grid(column=0, row=6, padx=15, pady=5, sticky="w")
 
-        self.party_size = Combobox(self.party_win, state="readonly")
+        self.party_size = ttk.Combobox(self.party_win, state="readonly")
         self.party_size['values'] = ("1", "2", "3", "4", "5")
         self.party_size.current(4)
         self.party_size.grid(column=1, row=6, padx=15, pady=5, sticky="w")
 
-        self.btn = Button(self.party_win, text="SAVE", command=self.party_save, width=40)
+        self.btn = ttk.Button(self.party_win, text="SAVE", command=self.party_save, width=40, style="Blue.TButton")
         self.btn.grid(column=0, row=7, padx=15, pady=15, columnspan=2)
-        self.btn.config(foreground="white", background="blue")
 
     def party_save(self):
         heroes = database.heroes.copy()
@@ -296,7 +294,7 @@ class Interface:
         # self.window.withdraw()
         print('Deploy status window')
         self.status_win = Toplevel(self.window)
-        self.status_win.configure(background="black")
+        self.status_win.configure(background=self.style.lookup("Status.TLabel", "background"))
         self.status_win.overrideredirect(1)
         self.status_win.protocol("WM_DELETE_WINDOW", self.status_on_close)
         self.status_win.title(f"Idle Bot Status")
@@ -308,7 +306,7 @@ class Interface:
         self.status_win.attributes("-topmost", True)
         self.status_win.geometry("+{}+{}".format(0, 0))
 
-        self.status_text = Label(self.status_win, foreground="white", background="black", text="IDLE BOT: Verify my settings before we get started.")
+        self.status_text = ttk.Label(self.status_win, text="IDLE BOT: Verify my settings before we get started.", style="Status.TLabel")
         self.status_text.grid(column=0, row=0, padx=5, pady=5, columnspan=2, sticky="w")
 
     def update_status(self, status):
